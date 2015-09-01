@@ -1708,7 +1708,7 @@ displayed in the mode-line.")
         :evil-leader "tmc")
 
       (defvar spacemacs-mode-line-left
-        '(((workspace-number window-number)
+        '(((persp-number workspace-number window-number)
            :fallback state-tag
            :separator "|"
            :face state-face)
@@ -1821,6 +1821,11 @@ It is a string holding:
         (spacemacs/workspace-number)
         :when (and (bound-and-true-p eyebrowse-mode)
                    (spacemacs/workspace-number)))
+
+      (spacemacs|define-mode-line-segment persp-number
+        (spacemacs/persp-number)
+        :when (and (bound-and-true-p persp-mode)
+                   (spacemacs/persp-number)))
 
       (spacemacs|define-mode-line-segment window-number
         (spacemacs/window-number)
