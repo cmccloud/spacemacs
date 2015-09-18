@@ -49,11 +49,12 @@ Cancels autosave on exiting perspectives mode."
     (when persp-mode-autosave
       (add-hook 'persp-mode-hook #'persp-autosave))
 
-    (defadvice dotspacemacs/user-config (after show-spacemacs-home activate)
-      "Show Spacemacs Home Buffer after perspectives load."
-      (persp-switch persp-nil-name)
-      (switch-to-buffer "*spacemacs*")
-      (delete-other-windows))
+    (when spacemacs-persp-show-home-at-startup
+      (defadvice dotspacemacs/user-config (after show-spacemacs-home activate)
+        "Show Spacemacs Home Buffer after perspectives load."
+        (persp-switch persp-nil-name)
+        (switch-to-buffer "*spacemacs*")
+        (delete-other-windows)))
 
     (defun persp-curr-name ()
       (interactive)

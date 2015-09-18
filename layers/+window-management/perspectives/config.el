@@ -11,6 +11,9 @@
 (defvar spacemacs-persp-nil-name "@Home"
   "Name o the `nil' perspective.")
 
+(defvar spacemacs-persp-show-home-at-startup t
+  "Whether to show the Spacemacs Home Buffer at startup")
+
 (defvar spacemacs-persp-save-dir (expand-file-name "perspectives/"
                                                    spacemacs-cache-directory)
   "Save perspectives in this directory.")
