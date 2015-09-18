@@ -15,8 +15,7 @@
                                :fetcher github
                                :repo "CestDiego/persp-mode.el"))
         helm
-        helm-projectile
-        ))
+        helm-projectile))
 
 (defun perspectives/init-persp-mode ()
   (use-package persp-mode
@@ -27,8 +26,16 @@
     (setq persp-save-dir spacemacs-persp-save-dir)
     (unless (file-exists-p persp-save-dir)
       (make-directory persp-save-dir))
+    ;; By default, persp mode wont affect either helm or ido
+    (defadvice persp-mode
+        (after suppress-buffer-isolation activate)
+      (remove-hook 'ido-make-buffer-list-hook #'persp-restrict-ido-buffers))
+    ;; files/buffers should not be added to a perspective by default
+    (setq persp-add-buffer-on-find-file nil)
+
     (persp-mode 1)
 
+    ;; quick swtiching between perspectives
     (defvar persp-toggle-perspective persp-nil-name
       "Previously selected perspective. Used with `persp-jump-to-last-persp'.")
 
@@ -38,6 +45,15 @@
     (defun persp-jump-to-last-persp ()
       (interactive)
       (persp-switch persp-toggle-perspective))
+
+    ;; ability to use helm find files but also adds to current perspective
+    (defun spacemacs/persp-helm-find-files (arg)
+      "As `spacemacs/helm-find-files, but additionally adds opened files
+to current perspective."
+      (interactive "P")
+      (let ((persp-add-buffer-on-find-file t))
+        (call-interactively
+         (spacemacs/helm-find-files arg))))
 
     (defun persp-autosave ()
       "Perspectives mode autosave.
