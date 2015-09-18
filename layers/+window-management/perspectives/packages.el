@@ -241,7 +241,7 @@ Cancels autosave on exiting perspectives mode."
     ;;   (interactive)
     ;;   (persp-switch persp-last-persp-name))
 
-    ;;; Custom Perspectives Micro State
+;;; Custom Perspectives Micro State
 
     (defvar spacemacs-custom-persp-alist '()
       "List of custom perspectives with their bindkeys.
