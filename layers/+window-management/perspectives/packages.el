@@ -56,6 +56,15 @@ to current perspective."
       (let ((persp-add-buffer-on-find-file t))
         (call-interactively 'spacemacs/helm-find-files)))
 
+    ;; ability to use helm mini but restrict buffers to persp buffers
+    (defun persp-helm-mini ()
+      "As `helm-mini' but restricts visible buffers by perspective."
+      (interactive)
+      (let ((ido-make-buffer-list-hook
+             (cons #'persp-restrict-ido-buffers
+                   ido-make-buffer-list-hook)))
+        (call-interactively 'helm-mini)))
+
     (defun persp-autosave ()
       "Perspectives mode autosave.
 Autosaves perspectives layouts every `persp-autosave-interal' seconds.
@@ -173,7 +182,7 @@ Cancels autosave on exiting perspectives mode."
                                     persp-list " | ")))
         (concat formatted-persp-list
                 (when (and perspectives-display-help
-                       (equal 0 spacemacs--perspectives-ms-doc-toggle))
+                           (equal 0 spacemacs--perspectives-ms-doc-toggle))
                   (concat
                    ;; "\n[n] next, [p/N] previous, [TAB] back and forth, "
                    "\n"
