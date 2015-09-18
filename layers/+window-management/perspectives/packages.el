@@ -195,6 +195,7 @@ Cancels autosave on exiting perspectives mode."
       ("N" persp-prev)
       ("p" persp-prev)
       ("P" spacemacs/helm-persp-switch-project :exit t)
+      ("L" spacemacs/helm-persp-switch :exit t)
       ("s" spacemacs/helm-persp-switch :exit t)
       ("r" spacemacs/persp-ms-rename :exit t)
       ("x" spacemacs/persp-ms-kill)
