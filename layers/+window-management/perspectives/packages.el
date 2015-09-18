@@ -33,18 +33,20 @@
     ;; files/buffers should not be added to a perspective by default
     (setq persp-add-buffer-on-find-file nil)
 
-    (persp-mode 1)
-
     ;; quick swtiching between perspectives
     (defvar persp-toggle-perspective persp-nil-name
       "Previously selected perspective. Used with `persp-jump-to-last-persp'.")
 
-    (defadvice persp-activate (before save-toggle-persp activate)
-      (setq persp-toggle-perspective persp-last-persp-name))
-
     (defun persp-jump-to-last-persp ()
       (interactive)
       (persp-switch persp-toggle-perspective))
+
+    (defadvice persp-activate
+        (before save-toggle-persp activate)
+      (setq persp-toggle-perspective persp-last-persp-name))
+
+    ;; activate persp mode
+    (persp-mode 1)
 
     ;; ability to use helm find files but also adds to current perspective
     (defun spacemacs/persp-helm-find-files (arg)
@@ -59,21 +61,21 @@ to current perspective."
       "Perspectives mode autosave.
 Autosaves perspectives layouts every `persp-autosave-interal' seconds.
 Cancels autosave on exiting perspectives mode."
-      (message "Perspectives mode autosaving enabled.")
-      (if persp-mode
-          (setq persp-autosave-timer
-                (run-with-timer
-                 persp-autosave-interval
-                 persp-autosave-interval
-                 (lambda ()
-                   (message "Saving perspectives to file.")
-                   (persp-save-state-to-file))))
+      (if (and persp-mode persp-mode-autosave)
+          (progn
+            (message "Perspectives mode autosaving enabled.")
+            (setq persp-autosave-timer
+                  (run-with-timer
+                   persp-autosave-interval
+                   persp-autosave-interval
+                   (lambda ()
+                     (message "Saving perspectives to file.")
+                     (persp-save-state-to-file)))))
         (when persp-autosave-timer
           (cancel-timer persp-autosave-timer)
           (setq persp-autosave-timer nil))))
 
-    (when persp-mode-autosave
-      (add-hook 'persp-mode-hook #'persp-autosave))
+    (add-hook 'persp-mode-hook #'persp-autosave)
 
     (when spacemacs-persp-show-home-at-startup
       (defadvice dotspacemacs/user-config (after show-spacemacs-home activate)
