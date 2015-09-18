@@ -54,8 +54,7 @@
 to current perspective."
       (interactive "P")
       (let ((persp-add-buffer-on-find-file t))
-        (call-interactively
-         (spacemacs/helm-find-files arg))))
+        (call-interactively 'spacemacs/helm-find-files)))
 
     (defun persp-autosave ()
       "Perspectives mode autosave.
