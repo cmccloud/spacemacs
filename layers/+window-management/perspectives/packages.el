@@ -45,26 +45,6 @@
         (before save-toggle-persp activate)
       (setq persp-toggle-perspective persp-last-persp-name))
 
-    ;; activate persp mode
-    (persp-mode 1)
-
-    ;; ability to use helm find files but also adds to current perspective
-    (defun spacemacs/persp-helm-find-files (arg)
-      "As `spacemacs/helm-find-files, but additionally adds opened files
-to current perspective."
-      (interactive "P")
-      (let ((persp-add-buffer-on-find-file t))
-        (call-interactively 'spacemacs/helm-find-files)))
-
-    ;; ability to use helm mini but restrict buffers to persp buffers
-    (defun persp-helm-mini ()
-      "As `helm-mini' but restricts visible buffers by perspective."
-      (interactive)
-      (let ((ido-make-buffer-list-hook
-             (cons #'persp-restrict-ido-buffers
-                   ido-make-buffer-list-hook)))
-        (call-interactively 'helm-mini)))
-
     (defun persp-autosave ()
       "Perspectives mode autosave.
 Autosaves perspectives layouts every `persp-autosave-interal' seconds.
@@ -84,6 +64,9 @@ Cancels autosave on exiting perspectives mode."
           (setq persp-autosave-timer nil))))
 
     (add-hook 'persp-mode-hook #'persp-autosave)
+
+    ;; activate persp mode
+    (persp-mode 1)
 
     (when spacemacs-persp-show-home-at-startup
       (defadvice dotspacemacs/user-config (after show-spacemacs-home activate)
@@ -383,6 +366,21 @@ Available PROPS:
                 ,(helm-build-dummy-source "Create new perspective"
                    :action
                    '(("Create new perspective" . persp-switch))))))
+  ;; ability to use helm find files but also adds to current perspective
+  (defun spacemacs/persp-helm-find-files (arg)
+    "As `spacemacs/helm-find-files, but additionally adds opened files
+to current perspective."
+    (interactive "P")
+    (let ((persp-add-buffer-on-find-file t))
+      (call-interactively 'spacemacs/helm-find-files)))
+  ;; ability to use helm mini but restrict buffers to persp buffers
+  (defun spacemacs/persp-helm-mini ()
+    "As `helm-mini' but restricts visible buffers by perspective."
+    (interactive)
+    (let ((ido-make-buffer-list-hook
+           (cons #'persp-restrict-ido-buffers
+                 ido-make-buffer-list-hook)))
+      (call-interactively 'helm-mini)))
   (defun spacemacs/helm-persp-close ()
     "Kills perspectives without killing the buffers"
     (interactive)
@@ -421,19 +419,20 @@ Available PROPS:
 (defun perspectives/post-init-helm-projectile ()
   (defun spacemacs/helm-persp-switch-project (arg)
     (interactive "P")
-    (helm
-     :sources (helm-build-in-buffer-source "*Helm Switch Project Perspective*"
-                :data (lambda ()
-                        (if (projectile-project-p)
-                            (cons (abbreviate-file-name (projectile-project-root))
-                                  (projectile-relevant-known-projects))
-                          projectile-known-projects))
-                :fuzzy-match helm-projectile-fuzzy-match
-                :mode-line helm-read-file-name-mode-line-string
-                :action '(("Switch to Project Perspective" .
-                           (lambda (project)
-                             (persp-switch project)
-                             (let ((projectile-completion-system 'helm))
-                               (projectile-switch-project-by-name project)))
-                           )))
-     :buffer "*persp projectile helm*")))
+    (let ((persp-add-buffer-on-find-file t))
+      (helm
+       :sources (helm-build-in-buffer-source "*Helm Switch Project Perspective*"
+                  :data (lambda ()
+                          (if (projectile-project-p)
+                              (cons (abbreviate-file-name (projectile-project-root))
+                                    (projectile-relevant-known-projects))
+                            projectile-known-projects))
+                  :fuzzy-match helm-projectile-fuzzy-match
+                  :mode-line helm-read-file-name-mode-line-string
+                  :action '(("Switch to Project Perspective" .
+                             (lambda (project)
+                               (persp-switch project)
+                               (let ((projectile-completion-system 'helm))
+                                 (projectile-switch-project-by-name project)))
+                             )))
+       :buffer "*persp projectile helm*"))))
