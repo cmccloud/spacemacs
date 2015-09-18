@@ -144,7 +144,10 @@ Cancels autosave on exiting perspectives mode."
       (interactive)
       (spacemacs/persp-ms-switch-by-pos 9))
 
-    (defun spacemacs//perspectives-ms-documentation ()
+    (defvar spacemacs--perspectives-ms-doc-toggle 1
+      "Display a short doc when nil, full doc otherwise.")
+
+    (defun spacemacs//perspectives-ms-doc ()
       "Return the docstring for the perspectives micro-state."
       (let* ((persp-list           (persp-names-current-frame-fast-ordered))
              (formatted-persp-list (mapconcat
@@ -152,7 +155,8 @@ Cancels autosave on exiting perspectives mode."
                                       (persp-format-name persp))
                                     persp-list " | ")))
         (concat formatted-persp-list
-                (when perspectives-display-help
+                (when (and perspectives-display-help
+                       (equal 0 spacemacs--perspectives-ms-doc-toggle))
                   (concat
                    ;; "\n[n] next, [p/N] previous, [TAB] back and forth, "
                    "\n"
@@ -165,11 +169,18 @@ Cancels autosave on exiting perspectives mode."
                    "[a|i] import [one|all] buffer(s) from other perspective\n"
                    "[w|l] [save|load] configuration [to|from] file")))))
 
+    (defun spacemacs//perspectives-ms-toggle-doc ()
+      (interactive)
+      (setq spacemacs--perspectives-ms-doc-toggle
+            (logxor spacemacs--perspectives-ms-doc-toggle 1)))
+
     (spacemacs|define-micro-state perspectives
-      :doc (spacemacs//perspectives-ms-documentation)
+      :doc (spacemacs//perspectives-ms-doc)
       :use-minibuffer t
       :evil-leader "L"
       :bindings
+      ;; need to exit in case number doesn't exist
+      ("?" spacemacs//perspectives-ms-toggle-doc)
       ("1" spacemacs/persp-switch-to-1 :exit t)
       ("2" spacemacs/persp-switch-to-2 :exit t)
       ("3" spacemacs/persp-switch-to-3 :exit t)
