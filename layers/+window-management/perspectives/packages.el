@@ -29,6 +29,16 @@
       (make-directory persp-save-dir))
     (persp-mode 1)
 
+    (defvar persp-toggle-perspective persp-nil-name
+      "Previously selected perspective. Used with `persp-jump-to-last-persp'.")
+
+    (defadvice persp-activate (before save-toggle-persp activate)
+      (setq persp-toggle-perspective persp-last-persp-name))
+
+    (defun persp-jump-to-last-persp ()
+      (interactive)
+      (persp-switch persp-toggle-perspective))
+
     (defun persp-autosave ()
       "Perspectives mode autosave.
 Autosaves perspectives layouts every `persp-autosave-interal' seconds.
@@ -147,6 +157,7 @@ Cancels autosave on exiting perspectives mode."
                    ;; "\n[n] next, [p/N] previous, [TAB] back and forth, "
                    "\n"
                    "[n|p] [next|previous] perspective, "
+                   "[tab] jump to last perspective \n"
                    "[s|r] [switch to or create|rename] perspective\n"
                    "[P] Projectile switch to perspective, [o] open custom perspective\n"
                    "[c|C] kill [current|other] perspective, "
@@ -159,7 +170,6 @@ Cancels autosave on exiting perspectives mode."
       :use-minibuffer t
       :evil-leader "L"
       :bindings
-      ;; ("<tab>" spacemacs/persp-ms-last) ;; <-- needs work upstream
       ("1" spacemacs/persp-switch-to-1 :exit t)
       ("2" spacemacs/persp-switch-to-2 :exit t)
       ("3" spacemacs/persp-switch-to-3 :exit t)
@@ -169,6 +179,7 @@ Cancels autosave on exiting perspectives mode."
       ("7" spacemacs/persp-switch-to-7 :exit t)
       ("8" spacemacs/persp-switch-to-8 :exit t)
       ("9" spacemacs/persp-switch-to-9 :exit t)
+      ("<tab>" persp-jump-to-last-persp) ;; <-- needs work upstream
       ("n" persp-next)
       ("N" persp-prev)
       ("p" persp-prev)
